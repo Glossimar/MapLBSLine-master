@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="purple_blue">#FF8161E8</color>
+    <color name="white">#FFDFDCE9</color>
+    <color name="light_blue">#1B8BFB</color>
+    <color name="light_gray">#FF8D8C91</color>
+    <color name="light_purple">#FF9175AE</color>
+    <color name="light_white">#FFFBFBFB</color>
+    <color name="sky">#FFA7D6D0</color>
+</resources>
