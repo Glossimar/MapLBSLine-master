@@ -23,10 +23,6 @@ import java.util.concurrent.ExecutionException;
 
 import static android.content.ContentValues.TAG;
 
-/**
- * Created by LENOVO on 2017/7/18.
- */
-
 public class ClientSocket{
 
 //    private Socket s;

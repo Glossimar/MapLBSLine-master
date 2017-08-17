@@ -7,10 +7,6 @@ import android.widget.Toast;
 
 import java.util.jar.Attributes;
 
-/**
- * Created by LENOVO on 2017/7/10.
- */
-
 public class DataBaseHelper extends SQLiteOpenHelper{
 
     private Context context;

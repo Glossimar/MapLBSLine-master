@@ -181,6 +181,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mLocationClient.start();
     }
 
+/**
+ * initLocation ： 初始化地图数据
+ */
     private void initLocation() {
         LocationClientOption option = new LocationClientOption();
         option.setScanSpan(3000);
