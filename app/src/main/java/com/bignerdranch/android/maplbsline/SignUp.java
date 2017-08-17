@@ -26,8 +26,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
         initView();
-
-
+        initData();
     }
 
     private void initView() {
@@ -35,30 +34,37 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener{
         phoneNumberEdit = (EditText) findViewById(R.id.signup_phoneNumber);
         passwordEdit = (EditText) findViewById(R.id.signup_password);
         signUp = (Button) findViewById(R.id.signup_button_add_new_client);
+        signUp.setOnClickListener(this);
     }
-
+/**
+ * iniData : 进行注册数据的获取和发送给服务器
+ **/
     private void initData() {
         phoneNumber = phoneNumberEdit.getText().toString();
         password = passwordEdit.getText().toString();
-        if (phoneNumber == null) {
+        if (phoneNumber.equals("")) {
             Toast.makeText(this, "号码不能为空", Toast.LENGTH_SHORT).show();
-        } else if (password == null)  {
+        } else if (password.equals(""))  {
             Toast.makeText(this, "注册密码不能为空", Toast.LENGTH_SHORT).show();
-        } else if (phoneNumber != null && password != null) {
+        } else if (!phoneNumber.equals("") && !password.equals("")) {
             ClientSocket.addNewClient(phoneNumber, password);
         }
     }
+
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.signup_button_add_new_client:
                 initData();
-                Intent intent = new Intent(this, SignIn.class);
-                intent.putExtra("phoneNumber", phoneNumber);
-                intent.putExtra("Password", password);
-                intent.putExtra("path","SignUp");
-                startActivity(intent);
+                // 如果服务器返回"true"，表示注册成功，跳转至登陆界面进行自动登录 ClientSocket.getAddCResFromServer()
+                if (true) {
+                    Intent intent = new Intent(this, SignIn.class);
+                    intent.putExtra("phoneNumber", phoneNumber);
+                    intent.putExtra("Password", password);
+                    intent.putExtra("path","SignUp");
+                    startActivity(intent);
+                }
                 finish();
                 break;
 

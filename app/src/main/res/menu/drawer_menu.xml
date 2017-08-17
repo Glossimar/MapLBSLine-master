@@ -4,7 +4,7 @@
         <item
             android:id="@+id/menu_name"
             android:icon="@drawable/name"
-            android:title="昵称"/>
+            android:title="我"/>
         <item
             android:id="@+id/menu_phone_num"
             android:icon="@drawable/phone_num"
@@ -15,7 +15,7 @@
             android:title="联系人"/>
         <item
             android:id="@+id/menu_track"
-            android:icon="@drawable/track"
+            android:icon="@drawable/location"
             android:title="我的轨迹"/>
     </group>
 </menu>

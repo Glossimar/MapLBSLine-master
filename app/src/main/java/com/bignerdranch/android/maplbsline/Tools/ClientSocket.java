@@ -66,7 +66,6 @@ public class ClientSocket{
                     BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
 //        BufferedWriter bw = new BufferedWriter(new FileWriter(phoneNum)
                     String line;
-
 //        List<String> phoneNumList = new ArrayList<>();
                     while ((line = br.readLine()) != null) {
 //            phoneNumList.add(line);
@@ -92,6 +91,7 @@ public class ClientSocket{
     }
 
     public static boolean getPasswordFromServer(final Socket s, final String phoneNum, final String password){
+        final String[] a = new String[1];
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -109,13 +109,47 @@ public class ClientSocket{
                             result = true;
                         }
                     }
+                    a[0] = "ok";
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }).start();
+        while (true) {
+            if (a[0] == "ok") {
+                break;
+            }
+        }
+        return result;
+    }
 
-        return false;
+    public static boolean getAddCResFromServer(){
+        final String[] a = new String[1];
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Socket s = new Socket("172.18.37.58", 45556);
+                    BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        if (line == "true") {
+                            result = true;
+                            break;
+                        }
+                    }
+                    a[0] = "ok";
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        while (true) {
+            if (a[0] == "ok") {
+                break;
+            }
+        }
+        return result;
     }
 
     public static void findCertenClientTrack(final Socket s, final String phoneNum){
@@ -207,7 +241,7 @@ public class ClientSocket{
             @Override
             public void run() {
                 try {
-                    Socket s = new Socket("10.13.134.168", 45556);
+                    Socket s = new Socket("172.18.37.58", 45556);
                     OutputStream os = s.getOutputStream();
                     os.write("Update Day2 and Day1".getBytes());
 //                    s.close();
@@ -225,7 +259,7 @@ public class ClientSocket{
             @Override
             public void run() {
                 try {
-                    Socket s = new Socket("192.168.43.44", 45556);
+                    Socket s = new Socket("172.18.37.58", 45556);
                     OutputStream os = s.getOutputStream();
                     Log.d(TAG, "checkNumFromServer: 0000000000000000000000000");
                     os.write("Check phone number".getBytes());
@@ -253,7 +287,8 @@ public class ClientSocket{
             @Override
             public void run() {
                 try {
-                    Socket s = new Socket("10.13.134.168", 45556);
+//                    10.13.134.168
+                    Socket s = new Socket("172.18.37.58", 45556);
                     OutputStream os = s.getOutputStream();
                     os.write("Check password".getBytes());
                     result = getPasswordFromServer(s, phoneNumber, password);
@@ -272,14 +307,16 @@ public class ClientSocket{
             @Override
             public void run() {
                 try {
-                    Socket s = new Socket("10.13.134.168", 45556);
+                    Socket s = new Socket("172.18.37.58", 45556);
                     OutputStream os = s.getOutputStream();
                     os.write("Add new client".getBytes());
                     BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
                     bw.write(phoneNum);
+                    Log.d(TAG, "run: " + phoneNum);
                     bw.newLine();
                     bw.flush();
                     bw.write(phoneNum + password);
+                    Log.d(TAG, "run: "+ phoneNum + password);
                     bw.newLine();
                     bw.flush();
                     s.shutdownOutput();
@@ -303,7 +340,7 @@ public class ClientSocket{
                 }
 
                 try {
-                    Socket s = new Socket("10.13.134.168", 45556);
+                    Socket s = new Socket("172.18.37.58", 45556);
                     OutputStream os = s.getOutputStream();
                     os.write("Add new location of latitude".getBytes());
                     BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
@@ -332,7 +369,7 @@ public class ClientSocket{
                 }
 
                 try {
-                    Socket s = new Socket("10.13.134.168", 45556);
+                    Socket s = new Socket("172.18.37.58", 45556);
                     OutputStream os = s.getOutputStream();
                     os.write("Add new location of longitude".getBytes());
                     BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
@@ -342,7 +379,7 @@ public class ClientSocket{
                         bw.flush();
                     }
                     s.shutdownOutput();
-//                    s.close();
+                    s.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -356,13 +393,13 @@ public class ClientSocket{
             @Override
             public void run() {
                 try {
-                    Socket s = new Socket("110.13.134.168", 45556);
+                    Socket s = new Socket("172.18.37.58", 45556);
                     OutputStream os = s.getOutputStream();
                     os.write("Get certen client latitude of track1".getBytes());
                     findCertenClientTrack(s, phoneNumber);
                     List<Double> latitudeList = getCertenClientDay1BufferLat(s);
 //                    s.close();
-                    s = new Socket("10.13.228.4", 45556);
+                    s = new Socket("172.18.37.58", 45556);
                     os.write("Get certen client longitude of track1".getBytes());
                     findCertenClientTrack(s, phoneNumber);
                     List<Double> longitudeList = getCertenClientDay1Bufferlng(s);
@@ -387,7 +424,7 @@ public class ClientSocket{
             @Override
             public void run() {
                 try {
-                    Socket s = new Socket("10.13.134.168", 45556);
+                    Socket s = new Socket("172.18.37.58", 45556);
                     OutputStream os = s.getOutputStream();
                     os.write("Search client".getBytes());
                     sendClientInfo(s, phoneNumber);

@@ -102,7 +102,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         navigationView = (NavigationView) findViewById(R.id.drawer_navigation);
         toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         mapView = (MapView) findViewById(R.id.main_mapview);
-
         initLayout();
         getPermissionAllow();
 //        drawLine();
@@ -140,15 +139,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void navigateTo(BDLocation location) {
+/**
+ * navigateTo : 第一次进入地图时，在地图上移动到我的位置
+ * */
+    private void navigateToFirst(BDLocation location) {
         if (isFirstLocate) {
-            LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
-            Toast.makeText(this, ll.toString(), Toast.LENGTH_SHORT).show();
-            MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
-            baiduMap.animateMapStatus(update);
-            update = MapStatusUpdateFactory.zoomTo(16f);
-            baiduMap.animateMapStatus(update);
-
+            navigate(location, null);
             if (i < 1) {
                 i++;
             } else {
@@ -164,6 +160,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         baiduMap.setMyLocationData(locationData);
     }
 
+    private void navigate(BDLocation location, LatLng lastLocation) {
+        if (location != null) {
+            LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
+            Toast.makeText(this, ll.toString(), Toast.LENGTH_SHORT).show();
+            MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
+            baiduMap.animateMapStatus(update);
+            update = MapStatusUpdateFactory.zoomTo(16f);
+            baiduMap.animateMapStatus(update);
+        } else {
+            MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(lastLocation);
+            baiduMap.animateMapStatus(update);
+            update = MapStatusUpdateFactory.zoomTo(16f);
+            baiduMap.animateMapStatus(update);
+        }
+    }
+
     private void requestLocation() {
         initLocation();
         mLocationClient.start();
@@ -175,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         option.setIsNeedAddress(true);
         option.setOpenGps(true);
 //        option.setCoorType("wgs84");
-        SDKInitializer.setCoordType(CoordType.BD09LL);
+        SDKInitializer.setCoordType(CoordType.GCJ02);
         mLocationClient.setLocOption(option);
     }
 
@@ -319,11 +331,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-//        dbHelper = new DataBaseHelper(this, "DayLine.db", null, 2);
+        dbHelper = new DataBaseHelper(this, "DayLine.db", null, 3);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         List<LatLng> allPoints = new ArrayList<>();
         List<LatLng> pointsNow = new ArrayList<>();
+        LatLng ll = null;
         switch (v.getId()) {
             case R.id.main_floatingButton:
                 if (isFirstClick) {
@@ -342,7 +355,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         double distanceTest = DistanceUtil.getDistance(latLng, allPoints.get(allPoints.size() - 1));
                                         if (distanceTest < 300)
                                             allPoints.add(latLng);
-                                        Log.d(TAG, "onClick: aaaaaaaaacccccaaaaaaabbbbbbbbbbbaaaaaaaaaaa" + distanceTest);
                                     }
                                 } else {
                                     drawLine(allPoints);
@@ -365,55 +377,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         db.insert("Day1", null, values);
                         values.clear();
                     }
-//                    values.put("latitude", 0d);
-//                    values.put("longitude", 0d);
-//                    db.insert("Day1", null, values);
-//                    values.clear();
                     allPoints.clear();
                     ptNew.clear();
                     isFirstClick = false;
                 } else {
                     if (ptNew.size() > 2) {                                                           //舍弃
-                        Log.d(TAG, "onClick: 11111111111111111111111111111111111111111111");
                         for (int i = 1; i < ptNew.size(); i++) {
                             values.put("latitude", ptNew.get(i).latitude);
                             values.put("longitude", ptNew.get(i).longitude);
-                            Log.d(TAG, "onClick: 6666666666666666666666666666666666666");
                             db.insert("Day1", null, values);
+                            ll =ptNew.get(ptNew.size() - 1);
                             values.clear();
                         }
-                        Log.d(TAG, "onClick: 777777777777777777777777777777777777777777777777777777");
                         drawLine(ptNew);
+                        navigate(null, ptNew.get(ptNew.size() - 1));
                         ptNew.clear();
-//                        Cursor cursor = db.query("Day1", null, null, null, null, null, null);
-//                        int time = 0;
-//                        if (cursor.moveToFirst()) {
-//                            do {
-//                                double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
-//                                double longtitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
-//                                LatLng latLng = new LatLng(latitude, longtitude);
-//                                if (time > 3) {
-//                                    if (allPoints.size() < 2) {
-//                                        allPoints.add(latLng);
-//                                        Log.d(TAG, "onClick: 22222222222222222222222222222222222222");
-//                                    } else {
-//                                        double distanceTest = DistanceUtil.getDistance(latLng, allPoints.get(allPoints.size()- 1));
-//                                        if (distanceTest < 100)
-//                                            allPoints.add(latLng);
-//                                        Log.d(TAG, "onClick: 333333333333333333333333333333333" + distanceTest);
-//                                    }
-//                                } else {
-//                                    time ++;
-//                                }
-//                            } while (cursor.moveToNext());
-//                        }
-//                        cursor.close();
-//                        for (int i = 20; i < pts.size(); i++) {
-//                            allPoints.add(pts.get(i));
-//                        }
-//                    } else {
-//                        Log.d(TAG, "onClick: ddddddddddddddddddddddddd" + pts.size());
-//                        drawLine(ptNew);
                     }
                 }
                 break;
@@ -431,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (bdLocation.getLocType() == BDLocation.TypeGpsLocation || bdLocation.getLocType()
                     == BDLocation.TypeNetWorkLocation) {
 
-                navigateTo(bdLocation);
+                navigateToFirst(bdLocation);
             }
             LatLng pt = new LatLng(bdLocation.getLatitude(), bdLocation.getLongitude());
             if (isFirstGetLocation) {
@@ -465,4 +443,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
+
 }

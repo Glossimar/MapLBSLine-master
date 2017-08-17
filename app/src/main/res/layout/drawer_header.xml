@@ -1,19 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="180dp"
-    android:padding="10dp"
-    android:background="@color/sky">
+    android:layout_height="205dp"
+
+    android:orientation="horizontal">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="205dp"
+        android:background="@drawable/drawer_background"
+        android:scaleType="center"/>
     <com.bignerdranch.android.imageloadingwan.CircleImageViewWan
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:id="@+id/navigation_avatar"
         android:src="@drawable/avatar"
-        android:layout_marginLeft="60dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="90dp"
         android:scaleType="centerCrop"
         app:BorderWith="3dp"
         app:BorderColor="@color/light_white"/>
 
-</RelativeLayout>
+    <TextView
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:id="@+id/navigation_name"
+        android:text="Dancing on th..."
+        android:layout_marginLeft="90dp"
+        android:layout_marginTop="95dp"
+        android:textColor="@color/light_white"
+        android:textStyle="bold"
+        android:gravity="center_vertical"
+        android:textSize="35dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/navigation_phone_number"
+        android:text="手机号码 ：13463988772"
+        android:textSize="15dp"
+        android:textColor="@color/light_gray"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="170dp" />
+</FrameLayout>

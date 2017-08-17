@@ -46,14 +46,23 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
-        Intent intent = new Intent();
-//        接受从公signup返回的数据，如果pat 路径是signup 则直接进行登陆
-
-//        if () {
-//        loginFromSingnUp();
-//    }
         initLayout();
+        Intent intent = getIntent();
+        String path = intent.getStringExtra("path");
 
+        Log.d(TAG, "loginFromSingnUp: 如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆");
+//        接受从公signup返回的数据，如果pat 路径是signup 则直接进行登陆
+        if (path == null) {
+            Log.d(TAG, "loginFromSingnUp: 如果是从注册界面（sinup)跳转回来，进入这个方法 null null null " );
+        } else {
+            Log.d(TAG, "onCreate: " + path);
+        }
+        if (path!= null && path.equals("SignUp")) {
+            String phoneNumfromSignUp = intent.getStringExtra("phoneNumber");
+            String passwordFromSignUp = intent.getStringExtra("Password");
+            Log.d(TAG, "onCreate: " + passwordFromSignUp + phoneNumfromSignUp);
+            loginFromSingnUp(phoneNumfromSignUp, passwordFromSignUp);
+        }
     }
 
     private void initLayout() {
@@ -88,6 +97,9 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
         }
     }
 
+    /**
+     * checkData : 获取今日日期，来检查是否需要更新数据库
+     */
     public long checkDate() {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -140,6 +152,9 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
         }
     }
 
+/**
+ *login : 点击进行登陆，从服务器上获取数据并核对
+ **/
     public void login() {
         Intent intent;
         password = passwordEdit.getText().toString();
@@ -168,10 +183,12 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
         }
     }
 
+    /**
+     * loginFromSignUp : 如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆
+     */
     private void loginFromSingnUp (String phoneNumeFromSignUp, String passworFromSignUp) {
+        Log.d(TAG, "loginFromSingnUp: 如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆");
         phoneNumEdit.setText(phoneNumeFromSignUp);
         passwordEdit.setText(passworFromSignUp);
-
-        login();
     }
 }

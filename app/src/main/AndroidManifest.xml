@@ -38,8 +38,8 @@
             android:enabled="true"
             android:process=":remote" />
 
-        <activity android:name=".MainActivity" />
-        <activity android:name=".SignUp"></activity>
+        <activity android:name=".SignUp" />
+        <activity android:name=".MainActivity"></activity>
     </application>
 
 </manifest>

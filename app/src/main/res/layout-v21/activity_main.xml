@@ -10,7 +10,6 @@
        android:layout_width="match_parent"
        android:layout_height="match_parent">
 
-
        <com.baidu.mapapi.map.MapView
            android:layout_width="match_parent"
            android:layout_height="match_parent"
@@ -18,19 +17,22 @@
            android:clickable="true"/>
 
        <android.support.design.widget.FloatingActionButton
-           android:layout_width="50dp"
-           android:layout_height="50dp"
+           android:layout_width="40dp"
+           android:layout_height="40dp"
            android:id="@+id/main_floatingButton"
-           android:layout_marginTop="400dp"
-           android:layout_gravity="end"
-           app:backgroundTint="@color/light_purple"
-           app:elevation="5dp" />
+           android:layout_marginBottom="200dp"
+           android:layout_marginEnd="40dp"
+           android:layout_gravity="bottom|end"
+           android:src="@drawable/my_location"
+           app:backgroundTint="@color/sky"
+           app:elevation="10dp"
+           />
 
        <android.support.v7.widget.Toolbar
            android:layout_width="match_parent"
            android:layout_height="50dp"
-           android:id="@+id/main_toolbar">
-
+           android:id="@+id/main_toolbar"
+           android:layout_marginTop="10dp">
        </android.support.v7.widget.Toolbar>
 
    </FrameLayout>
