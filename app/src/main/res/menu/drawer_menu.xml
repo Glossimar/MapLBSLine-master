@@ -17,5 +17,9 @@
             android:id="@+id/menu_track"
             android:icon="@drawable/location"
             android:title="我的轨迹"/>
+        <item
+            android:id="@+id/menu_quit"
+            android:icon="@drawable/quit"
+            android:title="退出当前账户"/>
     </group>
 </menu>

@@ -4,14 +4,17 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.baidu.mapapi.model.LatLng;
 import com.bignerdranch.android.imageloadingwan.CircleImageViewWan;
 import com.bignerdranch.android.maplbsline.Tools.ClientSocket;
 import com.bignerdranch.android.maplbsline.Tools.DataBaseHelper;
@@ -32,6 +35,7 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
     private final String TAG = "SginIn_Activity";
     private String password = null;
     private String phoneNum = null;
+    private List<LatLng> latLngList = new ArrayList<>();
 
     private CircleImageViewWan circleImage;
     private EditText phoneNumEdit;
@@ -46,7 +50,7 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
-        initLayout();
+        initView();
         Intent intent = getIntent();
         String path = intent.getStringExtra("path");
 
@@ -65,7 +69,11 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
         }
     }
 
-    private void initLayout() {
+    private void initView() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            //透明状态栏
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
         circleImage = (CircleImageViewWan) findViewById(R.id.signin_circle_avatar);
         phoneNumEdit = (EditText) findViewById(R.id.signin_phoneNumber);
         passwordEdit = (EditText) findViewById(R.id.signin_password);
@@ -76,7 +84,6 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
         signUp.setOnClickListener(this);
 //        ImageLoad.getCircleImage(this, url, circleImage);
 
-        updateSQLite();
     }
 
 
@@ -90,7 +97,6 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
             case R.id.signin_button_signUp:
                 Intent intent = new Intent(SignIn.this, SignUp.class);
                 startActivity(intent);
-                finish();
                 break;
             default:
                 break;
@@ -113,43 +119,61 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
         return dateSum;
     }
 
+    /**
+     * updateSQLite : 在新的一天更新数据库
+     */
     private void updateSQLite() {
-        dbHelper = new DataBaseHelper(this, "DayLine.db", null, 3);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        Cursor cursor = db.query("date", null, null, null, null, null, null);
-        if (cursor.getCount() == 0) {
-            values.put("everyday", checkDate());
-            db.insert("date", null, values);
-            values.clear();
-            Log.d(TAG, "updateSQLite: tttttttttttttttttttttttttttttttttttttttt");
-        } else if (cursor.moveToLast()) {
-            Log.d(TAG, "updateSQLite: vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv" + cursor.getLong(cursor.getColumnIndex("everyday")));
-            if (checkDate() > cursor.getLong(cursor.getColumnIndex("everyday"))) {
-                Log.d(TAG, "updateSQLite: llllllllllllllllllllllllllllllllllllllllllllll");
-                values.put("everyday", checkDate());
-                db.insert("date", null, values);
-                values.clear();
-
-                db.delete("Day2", null, null);
-
-                do {
-                    double lat = cursor.getDouble(cursor.getColumnIndex("latitude"));
-                    double log = cursor.getDouble(cursor.getColumnIndex("longitude"));
-
-                    values.put("latitude", lat);
-                    values.put("longitude", log);
-                    db.insert("Day2", null, values);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                dbHelper = new DataBaseHelper(SignIn.this.getApplicationContext(), "DayLine.db", null, 3);
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                ContentValues values = new ContentValues();
+                Cursor cursorDate = db.query("date", null, null, null, null, null, null);
+                if (cursorDate.getCount() == 0) {
+                    values.put("everyday", checkDate());
+                    db.insert("date", null, values);
                     values.clear();
-                } while (cursor.moveToNext());
+                    Log.d(TAG, "updateSQLite: tttttttttttttttttttttttttttttttttttttttt");
+                } else if (cursorDate.moveToLast()) {
+                    Log.d(TAG, "updateSQLite: vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv" + cursorDate.getLong(cursorDate.getColumnIndex("everyday")));
+                    if (checkDate() > cursorDate.getLong(cursorDate.getColumnIndex("everyday"))) {
 
-                db.delete("Day1", null, null);
-                ClientSocket.updateDay1AndDay2();
+                        values.put("everyday", checkDate());
+                        db.insert("date", null, values);
+                        values.clear();
 
-            } else {
-                Log.d(TAG, "updateSQLite: uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
+//                        ClientSocket.updateDay1AndDay2(phoneNum);
+                        db.delete("Day2", null, null);
+
+
+                        Cursor cursorDay1 = db.query("Day1", null, null, null, null, null, null);
+                        if (!(cursorDay1.getCount() == 0)) {
+                            Log.d(TAG, "updateSQLite: " + cursorDay1.getCount());
+                            if (cursorDay1.moveToFirst()) {
+                                do {
+                                    double lat = cursorDay1.getDouble(cursorDay1.getColumnIndex("latitude"));
+                                    double log = cursorDay1.getDouble(cursorDay1.getColumnIndex("longitude"));
+
+                                    values.put("latitude", lat);
+                                    values.put("longitude", log);
+                                    db.insert("Day2", null, values);
+                                    latLngList.add(new LatLng(lat, log));
+                                    values.clear();
+                                } while (cursorDay1.moveToNext());
+                                Log.d(TAG, "testtesttesttesttest: " + latLngList.size());
+                                ClientSocket.addLocationLatitude(phoneNum, "yesterday", latLngList, "true");
+                                ClientSocket.addLocationLongitude(phoneNum, "yesterday", latLngList);
+
+                                db.delete("Day1", null, null);
+                            }
+                        } else {
+                            Log.d(TAG, "updateSQLite: uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
+                        }
+                    }
+                }
             }
-        }
+        }).start();
     }
 
 /**
@@ -166,10 +190,12 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
             } else {
                 Toast.makeText(this, "请输入密码", Toast.LENGTH_SHORT).show();
             }
-        } else {
+        } else if (isIntNumber(phoneNum) && isTrueCount(phoneNum)){
             Log.d(TAG, "onClick: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"+phoneNum +"aaaaa" +passwordEdit.getText().toString() +phoneNum);
             if (ClientSocket.checkNumFromServer(phoneNum) &&
                     ClientSocket.checkPasswordFromServer(phoneNum, password)) {
+                updateSQLite();
+                Log.d(TAG, "login: inininiiininininininininininnniiinininininininininini");
                 intent = new Intent(SignIn.this, MainActivity.class);
                 intent.putExtra("phoneNumber", phoneNum);
                 startActivity(intent);
@@ -187,8 +213,41 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
      * loginFromSignUp : 如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆
      */
     private void loginFromSingnUp (String phoneNumeFromSignUp, String passworFromSignUp) {
-        Log.d(TAG, "loginFromSingnUp: 如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆");
         phoneNumEdit.setText(phoneNumeFromSignUp);
         passwordEdit.setText(passworFromSignUp);
+    }
+
+
+/**
+ * isIntNumber :判断电话号码是否只是数字
+ */
+    private boolean isIntNumber(String phoneNum) {
+        try {
+            Long.parseLong(phoneNum);
+            return true;
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "请输入有效电话号", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+    /**
+     *
+     */
+    private boolean isTrueCount(String phoneNum) {
+        try{
+            int len = phoneNum.length();
+            if (len == 11) {
+                return true;
+            } else {
+                Toast.makeText(this, "请输入有效电话号"+len, Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "请输入有效电话号", Toast.LENGTH_SHORT).show();
+            return false;
+        }
     }
 }

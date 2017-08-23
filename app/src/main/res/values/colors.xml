@@ -10,4 +10,6 @@
     <color name="light_purple">#FF9175AE</color>
     <color name="light_white">#FFFBFBFB</color>
     <color name="sky">#FFA7D6D0</color>
+    <color name="background_gray">#efefef</color>
+    <color name="pink">#FFF4C8F4</color>
 </resources>

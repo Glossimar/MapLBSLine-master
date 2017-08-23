@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.bignerdranch.android.maplbsline.UsersInfo">
+
+
+   <FrameLayout
+       android:layout_width="match_parent"
+       android:layout_height="270dp">
+
+       <ImageView
+           android:id="@+id/imageView"
+           android:layout_width="match_parent"
+           android:layout_height="210dp"
+           android:scaleType="centerCrop"
+           android:src="@drawable/drawer_background" />
+
+
+       <ImageView
+           android:layout_width="30dp"
+           android:layout_height="30dp"
+           android:id="@+id/users_info_back"
+           android:layout_marginTop="35dp"
+           android:layout_marginLeft="10dp"
+           android:src="@drawable/users_info_back"
+           />
+       <com.bignerdranch.android.imageloadingwan.CircleImageViewWan
+           android:layout_width="100dp"
+           android:layout_height="100dp"
+           android:src="@drawable/avatar"
+           android:layout_marginBottom="15dp"
+           android:layout_gravity="bottom|center_horizontal"
+           android:scaleType="centerCrop"
+           app:BorderWith="2dp"
+           app:BorderColor="@color/light_white"/>
+
+   </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="2dp"
+        android:orientation="horizontal">
+
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/name"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="20dp"
+            android:text="昵称："
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:id="@+id/users_info_name"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal">
+
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/phone_num"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="20dp"
+            android:text="注册手机号码："
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:id="@+id/users_info_phone_num"/>
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="45dp"
+        android:layout_marginTop="20dp">
+
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/location"/>
+
+        <ExpandableListView
+            android:layout_width="230dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="48dp"
+            android:id="@+id/users_info_expand"
+            android:dividerHeight="0dp"/>
+    </FrameLayout>
+</LinearLayout>

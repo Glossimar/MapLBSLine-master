@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/track_shape"
+    >
+
+    <TextView
+        android:layout_width="230dp"
+        android:layout_height="40dp"
+        android:id="@+id/expand_group_groupName"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="10dp"
+        android:text="   轨迹动态"
+        />
+    <ImageView
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:id="@+id/expand_group_toMap"
+        android:layout_marginLeft="200dp"
+        android:layout_marginTop="10dp"/>
+
+</FrameLayout>

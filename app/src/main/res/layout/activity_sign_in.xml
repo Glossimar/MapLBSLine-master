@@ -61,6 +61,7 @@
             android:textCursorDrawable="@drawable/cursor_color"
             android:cursorVisible="true"
             android:hint="           输入密码"
+            android:password="true"
             app:theme="@style/MyEditText"/>
     </LinearLayout>
 

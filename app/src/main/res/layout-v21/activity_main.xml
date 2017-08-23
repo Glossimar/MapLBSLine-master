@@ -17,22 +17,48 @@
            android:clickable="true"/>
 
        <android.support.design.widget.FloatingActionButton
-           android:layout_width="40dp"
-           android:layout_height="40dp"
+           android:layout_width="60dp"
+           android:layout_height="60dp"
            android:id="@+id/main_floatingButton"
-           android:layout_marginBottom="200dp"
-           android:layout_marginEnd="40dp"
+           android:layout_marginBottom="60dp"
+           android:layout_marginEnd="260dp"
            android:layout_gravity="bottom|end"
-           android:src="@drawable/my_location"
+           android:src="@drawable/location_floationg"
            app:backgroundTint="@color/sky"
            app:elevation="10dp"
            />
 
+       <android.support.design.widget.FloatingActionButton
+           android:layout_width="60dp"
+           android:layout_height="60dp"
+           android:id="@+id/main_floatingButton_getLine"
+           android:layout_marginBottom="60dp"
+           android:layout_marginEnd="50dp"
+           android:layout_gravity="bottom|end"
+           android:src="@drawable/track_floating"
+           app:backgroundTint="@color/sky"
+           app:elevation="10dp"
+           />
+
+       <TextView
+           android:layout_width="match_parent"
+           android:layout_height="20dp"
+           android:background="@drawable/toolbar_color"/>
+
        <android.support.v7.widget.Toolbar
            android:layout_width="match_parent"
-           android:layout_height="50dp"
+           android:layout_height="40dp"
+           android:layout_marginTop="20dp"
            android:id="@+id/main_toolbar"
-           android:layout_marginTop="10dp">
+           android:background="@drawable/toolbar_color">
+           <TextView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:id="@+id/main_toolbar_title"
+               android:layout_marginTop="5dp"
+               android:text="陪你走过漫长的岁月"
+               android:gravity="bottom"
+               android:textSize="20sp"/>
        </android.support.v7.widget.Toolbar>
 
    </FrameLayout>
@@ -43,6 +69,11 @@
         android:id="@+id/drawer_navigation"
         android:layout_gravity = "start"
         app:menu="@menu/drawer_menu"
-        app:headerLayout="@layout/drawer_header"/>
+        app:headerLayout="@layout/drawer_header"
+        >
+
+        <include
+            layout="@layout/drawer_header"/>
+    </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>

@@ -2,6 +2,7 @@ package com.bignerdranch.android.maplbsline;
 
 import android.Manifest;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -27,8 +28,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,28 +57,39 @@ import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.DistanceUtil;
 import com.bignerdranch.android.maplbsline.Tools.ClientSocket;
 import com.bignerdranch.android.maplbsline.Tools.DataBaseHelper;
+import com.bignerdranch.android.maplbsline.Tools.FriendsInfo;
+import com.bignerdranch.android.maplbsline.Tools.SetNameListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.R.id.toggle;
+import static android.content.ContentValues.TAG;
+import static com.baidu.location.d.j.N;
 import static com.baidu.location.d.j.S;
 import static com.baidu.location.d.j.b;
+import static com.baidu.location.d.j.n;
+import static com.baidu.location.d.j.p;
+import static com.baidu.location.d.j.t;
 import static com.baidu.location.d.j.v;
 import static com.bignerdranch.android.maplbsline.SignIn.dbHelper;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private final String TAG = "MainActivity";
     public LocationClient mLocationClient;
+    public LatLng pt;
     public List<LatLng> pts = new ArrayList<LatLng>();
     public List<LatLng> ptNew = new ArrayList<>();
 
     private BaiduMap baiduMap;
     private MapView mapView;
     private Toolbar toolbar;
+    private TextView drawerNumber;
+    private TextView drawerName;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private FloatingActionButton floatingButton;
+    private FloatingActionButton trackFloating;
     private Polyline mPolyline;
     private double distance;
 
@@ -86,6 +100,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private double firstLng;
     private long firstTime = 0;
     private int i = 0;
+    private String myPhoneNumber;
+    private String myName;
 
 //    private DataBaseHelper dbHelper;
 
@@ -97,16 +113,98 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_main);
 //        dbHelper = new DataBaseHelper(this, "DayLine.db", null, 1);
-        floatingButton = (FloatingActionButton) findViewById(R.id.main_floatingButton);
-        drawerLayout = (DrawerLayout) findViewById(R.id.main_drawerlayout);
-        navigationView = (NavigationView) findViewById(R.id.drawer_navigation);
-        toolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        mapView = (MapView) findViewById(R.id.main_mapview);
-        initLayout();
+        initView();
         getPermissionAllow();
 //        drawLine();
     }
 
+    public void initView() {
+        floatingButton = (FloatingActionButton) findViewById(R.id.main_floatingButton);
+        drawerLayout = (DrawerLayout) findViewById(R.id.main_drawerlayout);
+        navigationView = (NavigationView) findViewById(R.id.drawer_navigation);
+        trackFloating = (FloatingActionButton) findViewById(R.id.main_floatingButton_getLine);
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        mapView = (MapView) findViewById(R.id.main_mapview);
+        drawerName = (TextView) findViewById(R.id.navigation_name);
+        drawerNumber = (TextView) findViewById(R.id.navigation_phone_number);
+        baiduMap = mapView.getMap();
+        baiduMap.setMyLocationEnabled(true);
+        floatingButton.setOnClickListener(this);
+        trackFloating.setOnClickListener(this);
+
+        toolbar.setTitle("");
+        setSupportActionBar(toolbar);
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.setDrawerListener(toggle);
+        toggle.syncState();
+//        navigationView.setCheckedItem(R.id.menu_name);               将昵称设置为默认选项
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Intent intent = null;
+                drawerLayout.closeDrawers();
+                switch (item.getItemId()){
+                    case R.id.menu_name:
+                        intent = new Intent(MainActivity.this, UsersInfo.class);
+                        intent.putExtra("PhoneNumber", myPhoneNumber);
+                        intent.putExtra("Name", myName);
+                        intent.putExtra("Client", "me");
+                        startActivity(intent);
+                        break;
+                    case R.id.menu_phone_num:
+                        intent = new Intent(MainActivity.this, UsersInfo.class);
+                        intent.putExtra("PhoneNumber", myPhoneNumber);
+                        intent.putExtra("Name", myName);
+                        intent.putExtra("Client", "me");
+                        startActivity(intent);
+                        break;
+                    case R.id.menu_quit:
+                        intent = new Intent(MainActivity.this, SignIn.class);
+                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+                        ContentValues values = new ContentValues();
+                        values.put("latitude", 0d);
+                        values.put("longitude", 0d);
+                        db.insert("Day1", null, values);
+                        values.clear();
+                        ptNew.add(new LatLng(0d, 0d));
+                        ClientSocket.addLocationLatitude(myPhoneNumber, "today", ptNew, "false");
+                        ClientSocket.addLocationLongitude(myPhoneNumber, "today", ptNew);
+                        startActivity(intent);
+                        finish();
+                        break;
+                    case R.id.menu_friends:
+                        intent = new Intent(MainActivity.this, MyFriends.class);
+                        intent.putExtra("MyPhoneNumber", myPhoneNumber);
+                        startActivity(intent);
+                }
+                return true;
+            }
+        });
+
+        Intent intent = getIntent();
+        myPhoneNumber = intent.getStringExtra("phoneNumber");
+        Log.d(TAG, "initView: " + drawerNumber);
+        drawerNumber.setText("手机号码 ： " + myPhoneNumber);
+        ClientSocket.checkNameFromServer(myPhoneNumber, new SetNameListener() {
+            @Override
+            public void onFinish(String name) {
+                myName = name;
+                drawerName.setText(name);
+            }
+
+            @Override
+            public void onFinish(List<FriendsInfo> friendsInfoList) {}
+
+            @Override
+            public void onFinish(Intent intent) {}
+
+            @Override
+            public void onLocationGetFinish(List<Double> doubleList) {}
+        });
+
+    }
 
     public void getPermissionAllow() {
         List<String> permissionList = new ArrayList<>();
@@ -150,8 +248,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 isFirstLocate = false;
             }
-            Log.d(TAG, "onReceiveLocation: gggggggggggggggggggggggggggggg" + isFirstLocate + "gggggggggggggg" + location.getLongitude() + "   "
-                    + location.getLatitude());
         }
         MyLocationData.Builder locationBuilder = new MyLocationData.Builder();
         locationBuilder.latitude(location.getLatitude());
@@ -236,41 +332,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void initLayout() {
-        baiduMap = mapView.getMap();
-        baiduMap.setMyLocationEnabled(true);
-        floatingButton.setOnClickListener(this);
-
-        toolbar.setTitle("陪你走过漫长的岁月");
-        setSupportActionBar(toolbar);
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerLayout.setDrawerListener(toggle);
-        toggle.syncState();
-//        navigationView.setCheckedItem(R.id.menu_name);               将昵称设置为默认选项
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                drawerLayout.closeDrawers();
-                return true;
-            }
-        });
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                drawerLayout.openDrawer(GravityCompat.START);
-                break;
-            default:
-                break;
-        }
-        return true;
-    }
-
 /**
  * 绘制路线
  **/
@@ -278,9 +339,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void drawLine(final List<LatLng> latLngList) {
 
 //        final List<LatLng> ptNew = new ArrayList<>();
-
-        Log.d(TAG, "run: cccccccccccccccccccccccccccccc");
-
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -316,18 +374,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 values.put("longitude", 0d);
                 db.insert("Day1", null, values);
                 values.clear();
-                List<Double> latitudeList = new ArrayList<>();
-                for (int i = 1; i < ptNew.size(); i++) {
-                    latitudeList.add(ptNew.get(i).latitude);
+
+                ptNew.add(new LatLng(0d, 0d));
+                while (true) {
+                    if (ClientSocket.addLocationLatitude(myPhoneNumber, "today", ptNew, "false") && ClientSocket.addLocationLongitude(myPhoneNumber, "today", ptNew))
+                        System.exit(0);
                 }
-                ClientSocket.addNewTrackLatitude(latitudeList);
-                List<Double> longitudeList = new ArrayList<>();
-                for (int i = 1; i < ptNew.size(); i++) {
-                    longitudeList.add(ptNew.get(i).longitude);
-                }
-                ClientSocket.addNewTrackLongitude(longitudeList);
-                System.exit(0);
             }
+
         }
         return true;
     }
@@ -341,25 +395,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         List<LatLng> pointsNow = new ArrayList<>();
         LatLng ll = null;
         switch (v.getId()) {
-            case R.id.main_floatingButton:
+            case R.id.main_floatingButton_getLine:
                 if (isFirstClick) {
+                    // 进入程序时第一次点击会将数据库之前的路线进行绘制
                     Cursor cursor = db.query("Day1", null, null, null, null, null, null);
                     int time = 0;
                     if (cursor.moveToFirst()) {
                         do {
+                            //  开始从数据库中获取之前的坐标数据，将之前的坐标加入list,在drawline绘出当日的路线
                             double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
                             double longtitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
                             LatLng latLng = new LatLng(latitude, longtitude);
                             if (time > 5) {
+                                // 为了避免前几个坐标定位偏差，从第六个开始获取坐标点
                                 if (latitude != 0 && longtitude != 0) {
+                                    // 在每次退出应用时，输入坐标为（0，0），作为标记，
                                     if (allPoints.size() < 2) {
                                         allPoints.add(latLng);
                                     } else {
+                                        // 如果两个点之间坐标大于300，则舍弃这个坐标
                                         double distanceTest = DistanceUtil.getDistance(latLng, allPoints.get(allPoints.size() - 1));
                                         if (distanceTest < 300)
                                             allPoints.add(latLng);
                                     }
                                 } else {
+                                    //  如果到（0，0）就结束加点，将图线绘制出来，清空list
+                                    Log.d(TAG, "onClick: nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
                                     drawLine(allPoints);
                                     allPoints.clear();
                                 }
@@ -370,39 +431,82 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     cursor.close();
 
+                    // 获取当前行走的坐标点，进行此次路线的绘制
                     for (int i = 20; i < pts.size(); i++) {
+                        // 从第20个开始获取坐标点，避免刚刚启动时的定位偏差
                         pointsNow.add(pts.get(i));
                     }
+                    // 路线绘制
                     drawLine(pointsNow);
+                    List<LatLng> firstList = new ArrayList<>();
                     for (int i = 1; i < ptNew.size(); i++) {
+                        // 将这次的的点加入到数据库
                         values.put("latitude", ptNew.get(i).latitude);
                         values.put("longitude", ptNew.get(i).longitude);
                         db.insert("Day1", null, values);
+                        firstList.add(ptNew.get(i));
                         values.clear();
                     }
+//                    navigate(null, ptNew.get(ptNew.size() - 1));
+                    // 清空坐标list
+                    Log.d(TAG, "run: " + allPoints.size());
+                    ClientSocket.addLocationLatitude(myPhoneNumber, "today", firstList, "false");
+                    ClientSocket.addLocationLongitude(myPhoneNumber, "today", firstList);
                     allPoints.clear();
                     ptNew.clear();
                     isFirstClick = false;
                 } else {
-                    if (ptNew.size() > 2) {                                                           //舍弃
-                        for (int i = 1; i < ptNew.size(); i++) {
+                    List<LatLng> La = new ArrayList<>();
+                    // 如果是>1次点击按钮，则不进行之前路线的绘制，只进行上一次点击按钮到此次点击走过的路线的绘制
+                    if (ptNew.size() > 1) {                                                           //舍弃
+                        for (int i = 0; i < ptNew.size(); i++) {
                             values.put("latitude", ptNew.get(i).latitude);
                             values.put("longitude", ptNew.get(i).longitude);
                             db.insert("Day1", null, values);
                             ll =ptNew.get(ptNew.size() - 1);
+                            La.add(ptNew.get(i));
                             values.clear();
                         }
-                        drawLine(ptNew);
-                        navigate(null, ptNew.get(ptNew.size() - 1));
+                        drawLine(La);
+                        //每点一次都会将地图移到自己所在位置
+//                        navigate(null, ptNew.get(ptNew.size() - 1));
+                        ClientSocket.addLocationLatitude(myPhoneNumber, "today", La, "false");
+                        ClientSocket.addLocationLongitude(myPhoneNumber, "today", La);
                         ptNew.clear();
                     }
                 }
                 break;
+            case R.id.main_floatingButton:
+                if (ptNew.size() != 0)
+                navigate(null, pt);
            default:
                break;
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = null;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                break;
+            case R.id.toolbar_menu_search:
+                intent = new Intent(this, SearchClient.class);
+                intent.putExtra("MyPhoneNumber", myPhoneNumber);
+                startActivity(intent);
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
 
     public class MyLocationListener implements BDLocationListener {
 
@@ -414,7 +518,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 navigateToFirst(bdLocation);
             }
-            LatLng pt = new LatLng(bdLocation.getLatitude(), bdLocation.getLongitude());
+            pt = new LatLng(bdLocation.getLatitude(), bdLocation.getLongitude());
             if (isFirstGetLocation) {
                 firstLat = bdLocation.getLatitude();
                 firstLng = bdLocation.getLongitude();
@@ -426,10 +530,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     distance = DistanceUtil.getDistance(pt, pts.get(pts.size() - 1));
                     if (distance < 500 || bdLocation.getNetworkLocationType().equals("wf")) {
-                        Toast.makeText(MainActivity.this, bdLocation.getNetworkLocationType(), Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this, bdLocation.getNetworkLocationType(), Toast.LENGTH_SHORT).show();
                         pts.add(pt);
                         ptNew.add(pt);
-                        Toast.makeText(MainActivity.this, SDKInitializer.getCoordType()+"", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this, SDKInitializer.getCoordType()+"", Toast.LENGTH_SHORT).show();
                     } else if (distance > 500 || bdLocation.getLocType() > 161 || bdLocation.getLocType() < 167) {
                         Toast.makeText(MainActivity.this, "大于500" + pts.size(), Toast.LENGTH_SHORT).show();
                         Toast.makeText(MainActivity.this, "大于500" + pts.size(), Toast.LENGTH_SHORT).show();
@@ -437,8 +541,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
 
-            if (pts.size() > 3)
-                Toast.makeText(MainActivity.this, pts.size() + "", Toast.LENGTH_SHORT).show();
+//            if (pts.size() > 3)
+//                Toast.makeText(MainActivity.this, pts.size() + "", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -446,5 +550,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
-
 }
