@@ -29,7 +29,7 @@ public class ClientSocket{
     private static List<Double> latResult = null;
     private static List<Double> lonResult = null;
     private static List<LatLng> locationResult  = null;
-    private static String IPAddress = "172.18.39.227";
+    private static String IPAddress = "123.207.31.42";
     private static int portNumber = 45556;
 
 
