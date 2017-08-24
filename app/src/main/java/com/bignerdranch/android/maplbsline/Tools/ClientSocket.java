@@ -30,7 +30,7 @@ public class ClientSocket{
     private static List<Double> lonResult = null;
     private static List<LatLng> locationResult  = null;
     private static String IPAddress = "172.18.39.227";
-    private static int portNumber = 9999;
+    private static int portNumber = 45556;
 
 
     public static boolean getPhoneFromServer(final Socket s, final String phoneNum) throws IOException {
