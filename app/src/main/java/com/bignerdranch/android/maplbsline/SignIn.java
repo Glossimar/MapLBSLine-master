@@ -19,20 +19,14 @@ import com.bignerdranch.android.imageloadingwan.CircleImageViewWan;
 import com.bignerdranch.android.maplbsline.Tools.ClientSocket;
 import com.bignerdranch.android.maplbsline.Tools.DataBaseHelper;
 import com.bignerdranch.android.maplbsline.Tools.FriendsInfo;
-import com.bignerdranch.android.maplbsline.Tools.ImageLoad;
-import com.bignerdranch.android.maplbsline.Tools.SetNameListener;
 
-import java.sql.ClientInfoStatus;
+import com.bignerdranch.android.maplbsline.Tools.SetNameListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import static com.bignerdranch.android.maplbsline.Tools.ClientSocket.checkNumFromServer;
-import static com.bignerdranch.android.maplbsline.Tools.ClientSocket.checkPasswordFromServer;
-
 public class SignIn extends AppCompatActivity implements View.OnClickListener{
 
-    private String url = "http://p3.zhimg.com/69/d0/69d0ab1bde1988bd475bc7e0a25b713e.jpg";
     private final String TAG = "SginIn_Activity";
     private String password = null;
     private String phoneNum = null;
@@ -54,11 +48,9 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
         initView();
         Intent intent = getIntent();
         String path = intent.getStringExtra("path");
-
-        Log.d(TAG, "loginFromSingnUp: 如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆如果是从注册界面（sinup)跳转回来，进入这个方法，直接进行登陆");
 //        接受从公signup返回的数据，如果pat 路径是signup 则直接进行登陆
         if (path == null) {
-            Log.d(TAG, "loginFromSingnUp: 如果是从注册界面（sinup)跳转回来，进入这个方法 null null null " );
+            Log.d(TAG, "loginFromSingnUp： path == null " );
         } else {
             Log.d(TAG, "onCreate: " + path);
         }
@@ -83,7 +75,6 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
 
         signIn.setOnClickListener(this);
         signUp.setOnClickListener(this);
-//        ImageLoad.getCircleImage(this, url, circleImage);
 
     }
 
@@ -116,7 +107,7 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
         String  dateSumString = Integer.toString(year) + Integer.toString(month) + Integer.toString(day);
         long dateSum = (long) Integer.parseInt(dateSumString);
 
-        Log.d(TAG, "checkDate: cccccccccccccccccccccccccccccccccccccccc" + dateSum);
+        Log.d(TAG, "checkDate: " + dateSum);
         return dateSum;
     }
 
@@ -133,7 +124,7 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
             db.insert("date", null, values);
             values.clear();
         } else if (cursorDate.moveToLast()) {
-            Log.d(TAG, "updateSQLite: vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv" + cursorDate.getLong(cursorDate.getColumnIndex("everyday")));
+            Log.d(TAG, "updateSQLite: " + cursorDate.getLong(cursorDate.getColumnIndex("everyday")));
             if (checkDate() == cursorDate.getLong(cursorDate.getColumnIndex("everyday"))) {
                  values.put("everyday", checkDate());
                 db.insert("date", null, values);
@@ -154,14 +145,13 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
                             latLngList.add(new LatLng(lat, log));
                             values.clear();
                         } while (cursorDay1.moveToNext());
-                        Log.d(TAG, "testtesttesttesttest: " + latLngList.size());
                         ClientSocket.addLocationLatitude(phoneNum, "yesterday", latLngList, "true");
                         ClientSocket.addLocationLongitude(phoneNum, "yesterday", latLngList);
 
                         db.delete("Day1", null, null);
                     }
                 } else {
-                    Log.d(TAG, "updateSQLite: uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");}
+                    Log.d(TAG, "updateSQLite: The number of location is 0.");}
             }
         }
     }
@@ -170,7 +160,6 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
  *login : 点击进行登陆，从服务器上获取数据并核对
  **/
     public void login() {
-        Intent intent;
         password = passwordEdit.getText().toString();
         phoneNum = phoneNumEdit.getText().toString();
 
@@ -230,7 +219,6 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
 
                                 } else {
                                     updateSQLite();
-                                    Log.d(TAG, "login: inininiiininininininininininnniiinininininininininini");
                                     Intent intent = new Intent(SignIn.this, MainActivity.class);
                                     intent.putExtra("phoneNumber", phoneNum);
                                     startActivity(intent);
@@ -274,7 +262,7 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
     }
 
     /**
-     *
+     * isTrueCount ：判断用户是否输入了正确的号码位数
      */
     private boolean isTrueCount(String phoneNum) {
         try{
@@ -282,7 +270,7 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
             if (len == 11) {
                 return true;
             } else {
-                Toast.makeText(this, "请输入有效电话号"+len, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "请输入有效电话号", Toast.LENGTH_SHORT).show();
                 return false;
             }
         } catch (Exception e) {

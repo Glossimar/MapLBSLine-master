@@ -3,10 +3,8 @@ package com.bignerdranch.android.maplbsline;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -16,9 +14,7 @@ import com.bignerdranch.android.maplbsline.Tools.ClientSocket;
 import com.bignerdranch.android.maplbsline.Tools.FriendsInfo;
 import com.bignerdranch.android.maplbsline.Tools.SetNameListener;
 
-import org.w3c.dom.Text;
 
-import java.net.Socket;
 import java.util.List;
 
 public class SearchClient extends AppCompatActivity implements View.OnClickListener{
@@ -74,7 +70,7 @@ public class SearchClient extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        Intent intent = null;
+        Intent intent;
         switch (view.getId()) {
             case R.id.search_client_back:
                 finish();

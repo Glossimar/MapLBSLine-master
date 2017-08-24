@@ -6,18 +6,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
-import android.os.Build;
-import android.os.Handler;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -26,13 +20,10 @@ import android.os.Bundle;
 
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,10 +40,8 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
-import com.baidu.mapapi.map.PolygonOptions;
 import com.baidu.mapapi.map.Polyline;
 import com.baidu.mapapi.map.PolylineOptions;
-import com.baidu.mapapi.map.Stroke;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.DistanceUtil;
 import com.bignerdranch.android.maplbsline.Tools.ClientSocket;
@@ -63,15 +52,6 @@ import com.bignerdranch.android.maplbsline.Tools.SetNameListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.R.id.toggle;
-import static android.content.ContentValues.TAG;
-import static com.baidu.location.d.j.N;
-import static com.baidu.location.d.j.S;
-import static com.baidu.location.d.j.b;
-import static com.baidu.location.d.j.n;
-import static com.baidu.location.d.j.p;
-import static com.baidu.location.d.j.t;
-import static com.baidu.location.d.j.v;
 import static com.bignerdranch.android.maplbsline.SignIn.dbHelper;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -143,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Intent intent = null;
+                Intent intent;
                 drawerLayout.closeDrawers();
                 switch (item.getItemId()){
                     case R.id.menu_name:
@@ -262,7 +242,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void navigate(BDLocation location, LatLng lastLocation) {
         if (location != null) {
             LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
-            Toast.makeText(this, ll.toString(), Toast.LENGTH_SHORT).show();
             MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
             baiduMap.animateMapStatus(update);
             update = MapStatusUpdateFactory.zoomTo(16f);
@@ -340,22 +319,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
  **/
 
     private void drawLine(final List<LatLng> latLngList) {
-
-//        final List<LatLng> ptNew = new ArrayList<>();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-//                ptNew.add(pts.get(1));
-//                for (int i = 2; i < pts.size(); i++) {
-//                    ptNew.add(pts.get(i));
-//                }
-
                 if (latLngList.size() > 2) {
                     OverlayOptions ooPolyline = new PolylineOptions().width(10)
-//                            .color().points(latLngList);
                             .color(0xAAFF0000).points(latLngList);
                     mPolyline = (Polyline) baiduMap.addOverlay(ooPolyline);
-                    Log.d(TAG, "drawLine: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" + pts.size() + pts);
+                    Log.d(TAG, "drawLine: " + pts.size() + pts);
                 }
             }
         });
@@ -370,7 +341,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 firstTime = secondTime;
                 return true;
             } else {
-//                dbHelper = new DataBaseHelper(this, "DayLine.db", null, 1);
                 SQLiteDatabase db = dbHelper.getWritableDatabase();
                 ContentValues values = new ContentValues();
                 values.put("latitude", 0d);
@@ -396,7 +366,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ContentValues values = new ContentValues();
         List<LatLng> allPoints = new ArrayList<>();
         List<LatLng> pointsNow = new ArrayList<>();
-        LatLng ll = null;
         switch (v.getId()) {
             case R.id.main_floatingButton_getLine:
                 if (isFirstClick) {
@@ -423,7 +392,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     }
                                 } else {
                                     //  如果到（0，0）就结束加点，将图线绘制出来，清空list
-                                    Log.d(TAG, "onClick: nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
                                     drawLine(allPoints);
                                     allPoints.clear();
                                 }
@@ -466,7 +434,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             values.put("latitude", ptNew.get(i).latitude);
                             values.put("longitude", ptNew.get(i).longitude);
                             db.insert("Day1", null, values);
-                            ll =ptNew.get(ptNew.size() - 1);
+                            ptNew.get(ptNew.size() - 1);
                             La.add(ptNew.get(i));
                             values.clear();
                         }
@@ -495,13 +463,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = null;
         switch (item.getItemId()) {
             case android.R.id.home:
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.toolbar_menu_search:
-                intent = new Intent(this, SearchClient.class);
+                Intent intent = new Intent(this, SearchClient.class);
                 intent.putExtra("MyPhoneNumber", myPhoneNumber);
                 startActivity(intent);
                 break;
@@ -511,7 +478,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
-    public class MyLocationListener implements BDLocationListener {
+    private class MyLocationListener implements BDLocationListener {
 
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
@@ -533,19 +500,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     distance = DistanceUtil.getDistance(pt, pts.get(pts.size() - 1));
                     if (distance < 500 || bdLocation.getNetworkLocationType().equals("wf")) {
-//                        Toast.makeText(MainActivity.this, bdLocation.getNetworkLocationType(), Toast.LENGTH_SHORT).show();
                         pts.add(pt);
                         ptNew.add(pt);
-//                        Toast.makeText(MainActivity.this, SDKInitializer.getCoordType()+"", Toast.LENGTH_SHORT).show();
                     } else if (distance > 500 || bdLocation.getLocType() > 161 || bdLocation.getLocType() < 167) {
-                        Toast.makeText(MainActivity.this, "大于500" + pts.size(), Toast.LENGTH_SHORT).show();
-                        Toast.makeText(MainActivity.this, "大于500" + pts.size(), Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "onReceiveLocation: 两坐标点之间的距离大于500米， 距离为" + distance);
                     }
                 }
             }
-
-//            if (pts.size() > 3)
-//                Toast.makeText(MainActivity.this, pts.size() + "", Toast.LENGTH_SHORT).show();
         }
 
         @Override

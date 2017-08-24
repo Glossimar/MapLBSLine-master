@@ -8,9 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.baidu.location.BDLocation;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.MapStatusUpdate;
@@ -91,7 +89,6 @@ public class TrackMap extends AppCompatActivity implements View.OnClickListener{
 
                     @Override
                     public void onLocationGetFinish(List<Double> doubleList) {
-                        Log.d("TrackMap", "initView: jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
                         latitudeList = doubleList;
                     }
                 });
@@ -114,15 +111,14 @@ public class TrackMap extends AppCompatActivity implements View.OnClickListener{
                             @Override
                             public void run() {
                                 longitudeList = doubleList;
-                                trackList = new ArrayList<LatLng>();
-                                Log.d("TrackMap", "onLocationGetFinish: " + doubleList.size());
+                                trackList = new ArrayList<>();
+
                                 initLocationLine(latitudeList, longitudeList);
                             }
                         });
                     }
                 });
             } else if (date.equals("yesterday")) {
-//
                 ClientSocket.getLocationLatitudeFromServer("yesterday", phoneNumber, new SetNameListener() {
                     @Override
                     public void onFinish(String name) {}
@@ -161,7 +157,7 @@ public class TrackMap extends AppCompatActivity implements View.OnClickListener{
                             @Override
                             public void run() {
                                 longitudeList = doubleList;
-                                trackList = new ArrayList<LatLng>();
+                                trackList = new ArrayList<>();
                                 Log.d("TrackMap", "onLocationGetFinish: " + doubleList.size());
                                 initLocationLine(latitudeList, longitudeList);
                             }
@@ -169,16 +165,11 @@ public class TrackMap extends AppCompatActivity implements View.OnClickListener{
                     }
                 });
             }
-        } else if (client.equals("other")) {
-            if (date.equals("today")) {
-            } else if (date.equals("yesterday")) {
-            }
         }
     }
 
 
     private void drawLine(final List<LatLng> latLngList) {
-        Log.d("TrackMap", "run: cccccccccccccccccccccccccccccc");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -186,7 +177,7 @@ public class TrackMap extends AppCompatActivity implements View.OnClickListener{
                     OverlayOptions ooPolyline = new PolylineOptions().width(10)
                             .color(0xAAFF0000).points(latLngList);
                     mPolyline = (Polyline) baiduMap.addOverlay(ooPolyline);
-                    Log.d("TrackMap", "drawLine: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" + latLngList.size());
+                    Log.d("TrackMap", "drawLine: " + latLngList.size());
                     navigate(latLngList.get(latLngList.size() - 1));
                 }
             }
@@ -197,43 +188,34 @@ public class TrackMap extends AppCompatActivity implements View.OnClickListener{
      * getListFromDB: 从数据库里获取坐标点，并且在图中绘制出来；
      */
     private void initLocationLine(List<Double> latList, List<Double> lonList) {
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                cursor = db.query(bookName, null, null, null, null, null, null);
-//                if (cursor.moveToFirst()) {
-//                    int time = 0;
-//                    do {
-        for (int i = 0; i < lonList.size(); i++) {
-                        double latitude = latList.get(i);
-                        double longtitude = lonList.get(i);
-                        LatLng latLng = new LatLng(latitude, longtitude);
-                            // 为了避免前几个坐标定位偏差，从第六个开始获取坐标点
-                            if (latitude != 0 && longtitude != 0) {
-                                // 在每次退出应用时，输入坐标为（0，0），作为标记，
-                                if (trackList.size() < 2) {
-                                    trackList.add(latLng);
-                                } else {
-                                    // 如果两个点之间坐标大于300，则舍弃这个坐标
-                                    double distanceTest = DistanceUtil.getDistance(latLng, trackList.get(trackList.size() - 1));
-                                    if (distanceTest < 300)
-                                        Log.d("TrackMap", "getListFromDB: " + latLng.longitude + latLng.latitude);
-                                        trackList.add(latLng);
-                                }
-                            } else {
-                                //  如果到（0，0）就结束加点，将图线绘制出来，清空list
-                                Log.d("TrackMap", "onClick: nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
-                                drawLine(trackList);
-                                trackList.clear();
-                            }
-                        }
-//                     while (cursor.moveToNext());
-//                }
-                drawLine(trackList);
-//                cursor.close();
-//            }
-//        }).start();
+        int latlngSize = 0;
+        if (latList.size() == lonList.size()) latlngSize = latList.size();
+        else if (latList.size() > lonList.size()) latlngSize = lonList.size();
+        else if (latList.size() < lonList.size()) latlngSize = latList.size();
 
+        for (int i = 0; i < latlngSize; i++) {
+            double latitude = latList.get(i);
+            double longtitude = lonList.get(i);
+            LatLng latLng = new LatLng(latitude, longtitude);
+            // 为了避免前几个坐标定位偏差，从第六个开始获取坐标点
+            if (latitude != 0 && longtitude != 0) {
+                // 在每次退出应用时，输入坐标为（0，0），作为标记，
+                if (trackList.size() < 2) {
+                    trackList.add(latLng);
+                } else {
+                    // 如果两个点之间坐标大于300，则舍弃这个坐标
+                    double distanceTest = DistanceUtil.getDistance(latLng, trackList.get(trackList.size() - 1));
+                    if (distanceTest < 300)
+                        Log.d("TrackMap", "getListFromDB: " + latLng.longitude + latLng.latitude);
+                    trackList.add(latLng);
+                }
+            } else {
+                //  如果到（0，0）就结束加点，将图线绘制出来，清空list
+                drawLine(trackList);
+                trackList.clear();
+            }
+        }
+        drawLine(trackList);
     }
 
     /**
@@ -266,7 +248,6 @@ public class TrackMap extends AppCompatActivity implements View.OnClickListener{
 
     @Override
     public void onClick(View view) {
-        Intent intent;
         switch (view.getId()) {
             case R.id.track_map_back:
                 finish();

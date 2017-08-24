@@ -1,6 +1,5 @@
 package com.bignerdranch.android.maplbsline.Tools;
 
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -34,7 +33,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHold
         TextView name;
         TextView phoneNumber;
 
-        public ViewHolder (View itemView) {
+        private ViewHolder (View itemView) {
             super(itemView);
             clientView = itemView;
             followImage = (ImageView) itemView.findViewById(R.id.friends_item_follow);

@@ -9,7 +9,6 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bignerdranch.android.maplbsline.Tools.ClientSocket;
 import com.bignerdranch.android.maplbsline.Tools.ExpandAdapter;
 import com.bignerdranch.android.maplbsline.Tools.FriendsInfo;
 import com.bignerdranch.android.maplbsline.Tools.SetNameListener;
@@ -40,7 +39,6 @@ public class UsersInfo extends AppCompatActivity implements View.OnClickListener
         phoneNumber = intent.getStringExtra("PhoneNumber");
         name = intent.getStringExtra("Name");
         client = intent.getStringExtra("Client");
-        Log.d("UserInfo", "initData: " + name);
     }
     private void initView() {
         phoneNumberView = (TextView) findViewById(R.id.users_info_phone_num);
@@ -77,22 +75,7 @@ public class UsersInfo extends AppCompatActivity implements View.OnClickListener
 
     @Override
     public void onClick(View view) {
-        Intent intent;
         switch (view.getId()) {
-//            case R.id.users_info_track:
-//                intent = new Intent(this, TrackMap.class);
-//                intent.putExtra("PhoneNumber", phoneNumber);
-//                intent.putExtra("Date", "today");
-//                intent.putExtra("Client", "me");
-//                startActivity(intent);
-//                break;
-//            case R.id.users_info_toMap:
-//                intent = new Intent(this, TrackMap.class);
-//                intent.putExtra("PhoneNumber", phoneNumber);
-//                intent.putExtra("Date", "today");
-//                intent.putExtra("Client", "me");
-//                startActivity(intent);
-//                break;
             case R.id.users_info_back:
                 finish();
             default:

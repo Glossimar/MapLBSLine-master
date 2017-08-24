@@ -2,19 +2,18 @@ package com.bignerdranch.android.maplbsline.Tools;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 
 import com.bignerdranch.android.maplbsline.R;
 import com.bignerdranch.android.maplbsline.TrackMap;
 
-import org.w3c.dom.Text;
 
 /**
  * Created by glossimar on 2017/8/21.
@@ -77,17 +76,6 @@ public class ExpandAdapter extends BaseExpandableListAdapter {
         } else {
             selectedImage.setBackgroundResource(R.drawable.go_map);
         }
-//        v.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (selectedImage.getBackground().getConstantState().equals(context.getResources()
-//                        .getDrawable(R.drawable.go_map).getConstantState())){
-//                    selectedImage.setBackgroundResource(R.drawable.expanded_indicatior);
-//                }else {
-//                    selectedImage.setBackgroundResource(R.drawable.go_map);
-//                }
-//            }
-//        });
         return v;
     }
 

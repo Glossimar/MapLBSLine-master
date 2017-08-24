@@ -5,20 +5,18 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
-import java.util.jar.Attributes;
-
 public class DataBaseHelper extends SQLiteOpenHelper{
 
     private Context context;
-    public final String Day1 = "create table Day1 ("
+    private final String Day1 = "create table Day1 ("
             +"latitude double, "
             +"longitude double)";
 
-    public final String Day2 = "create table Day2 ("
+    private final String Day2 = "create table Day2 ("
             +"latitude double, "
             +"longitude double)";
 
-    public final String date = "create table date ("
+    private final String date = "create table date ("
             +"everyday long)";
 
     public DataBaseHelper (Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
