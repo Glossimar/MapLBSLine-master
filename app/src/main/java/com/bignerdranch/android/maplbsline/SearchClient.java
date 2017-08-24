@@ -80,42 +80,74 @@ public class SearchClient extends AppCompatActivity implements View.OnClickListe
                 finish();
                 break;
             case R.id.search_client_goSearch:
-                 searchNumber = searchEdit.getText().toString();
-                if (ClientSocket.checkNumFromServer(searchNumber)) {
-                    clientRelative.setVisibility(View.VISIBLE);
-                    resultText.setVisibility(View.VISIBLE);
-                    resiltDividingLine.setVisibility(View.VISIBLE);
-                    resultNumber.setText(searchNumber);
-                    ClientSocket.checkNameFromServer(searchNumber, new SetNameListener() {
-                        @Override
-                        public void onFinish(final String name) {
+                searchNumber = searchEdit.getText().toString();
+                ClientSocket.checkNumFromServer(searchNumber, new SetNameListener() {
+                    @Override
+                    public void onFinish(String name) {}
+
+                    @Override
+                    public void onFinish(List<FriendsInfo> friendsInfoList) {}
+
+                    @Override
+                    public void onFinish(Intent intent) {}
+
+                    @Override
+                    public void onFinish(boolean result) {
+                        if (result) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    searchName = name;
-                                    resultName.setText(name);
+                                    clientRelative.setVisibility(View.VISIBLE);
+                                    resultText.setVisibility(View.VISIBLE);
+                                    resiltDividingLine.setVisibility(View.VISIBLE);
+                                    resultNumber.setText(searchNumber);
                                 }
                             });
+
+                            ClientSocket.checkNameFromServer(searchNumber, new SetNameListener() {
+                                @Override
+                                public void onFinish(final String name) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            searchName = name;
+                                            resultName.setText(name);
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onFinish(List<FriendsInfo> friendsInfoList) {
+                                }
+
+                                @Override
+                                public void onFinish(Intent intent) {
+                                }
+
+                                @Override
+                                public void onFinish(boolean result) {
+                                }
+
+                                @Override
+                                public void onLocationGetFinish(List<Double> doubleList) {
+                                }
+                            });
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    resiltDividingLine.setVisibility(View.GONE);
+                                    resultText.setVisibility(View.GONE);
+                                    resiltDividingLine.setVisibility(View.GONE);
+                                    clientRelative.setVisibility(View.GONE);
+                                    Toast.makeText(SearchClient.this, "用户不存在哦", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
                         }
-
-                        @Override
-                        public void onFinish(List<FriendsInfo> friendsInfoList) {}
-
-                        @Override
-                        public void onFinish(Intent intent) {}
-
-                        @Override
-                        public void onLocationGetFinish(List<Double> doubleList) {}
-                    });
-                    Log.d("SearchClient", "onClick: truetruetruetruetruetruetruetruetureutrue");
-                } else {
-                    resiltDividingLine.setVisibility(View.GONE);
-                    resultText.setVisibility(View.GONE);
-                    resiltDividingLine.setVisibility(View.GONE);
-                    clientRelative.setVisibility(View.GONE);
-                    Log.d("SearchClient", "onClick: falsefalsefalsefalsefalsefalsefalsefalsefalsefalse");
-                    Toast.makeText(this, "用户不存在哦", Toast.LENGTH_SHORT).show();
-                }
+                    }
+                    @Override
+                    public void onLocationGetFinish(List<Double> doubleList) {}});
                 break;
             case R.id.search_client_result_relative:
                 intent = new Intent(this, UsersInfo.class);

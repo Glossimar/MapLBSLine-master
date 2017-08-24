@@ -87,6 +87,9 @@ public class TrackMap extends AppCompatActivity implements View.OnClickListener{
                     public void onFinish(Intent intent) {}
 
                     @Override
+                    public void onFinish(boolean result) {}
+
+                    @Override
                     public void onLocationGetFinish(List<Double> doubleList) {
                         Log.d("TrackMap", "initView: jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
                         latitudeList = doubleList;
@@ -101,6 +104,9 @@ public class TrackMap extends AppCompatActivity implements View.OnClickListener{
 
                     @Override
                     public void onFinish(Intent intent) {}
+
+                    @Override
+                    public void onFinish(boolean result) {}
 
                     @Override
                     public void onLocationGetFinish(final List<Double> doubleList) {
@@ -128,6 +134,9 @@ public class TrackMap extends AppCompatActivity implements View.OnClickListener{
                     public void onFinish(Intent intent) {}
 
                     @Override
+                    public void onFinish(boolean result) {}
+
+                    @Override
                     public void onLocationGetFinish(List<Double> doubleList) {
                         Log.d("TrackMap", "initView: jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
                         latitudeList = doubleList;
@@ -142,6 +151,9 @@ public class TrackMap extends AppCompatActivity implements View.OnClickListener{
 
                     @Override
                     public void onFinish(Intent intent) {}
+
+                    @Override
+                    public void onFinish(boolean result) {}
 
                     @Override
                     public void onLocationGetFinish(final List<Double> doubleList) {

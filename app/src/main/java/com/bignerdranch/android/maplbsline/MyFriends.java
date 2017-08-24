@@ -57,6 +57,9 @@ public class MyFriends extends AppCompatActivity implements View.OnClickListener
             public void onFinish(Intent intent) {}
 
             @Override
+            public void onFinish(boolean result) {}
+
+            @Override
             public void onLocationGetFinish(List<Double> doubleList) {}
         });
     }
@@ -67,6 +70,7 @@ public class MyFriends extends AppCompatActivity implements View.OnClickListener
         backImage = (ImageView) findViewById(R.id.my_friends_back);
 
         backImage.setOnClickListener(this);
+        toolbar.setTitle("");
     }
 
     @Override

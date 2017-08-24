@@ -12,5 +12,6 @@ public interface SetNameListener {
     void onFinish(String name);
     void onFinish(List<FriendsInfo> friendsInfoList);
     void onFinish(Intent intent);
+    void onFinish(boolean result);
     void onLocationGetFinish(List<Double> doubleList);
 }

@@ -18,7 +18,9 @@ import com.baidu.mapapi.model.LatLng;
 import com.bignerdranch.android.imageloadingwan.CircleImageViewWan;
 import com.bignerdranch.android.maplbsline.Tools.ClientSocket;
 import com.bignerdranch.android.maplbsline.Tools.DataBaseHelper;
+import com.bignerdranch.android.maplbsline.Tools.FriendsInfo;
 import com.bignerdranch.android.maplbsline.Tools.ImageLoad;
+import com.bignerdranch.android.maplbsline.Tools.SetNameListener;
 
 import java.sql.ClientInfoStatus;
 import java.util.ArrayList;
@@ -27,7 +29,6 @@ import java.util.List;
 
 import static com.bignerdranch.android.maplbsline.Tools.ClientSocket.checkNumFromServer;
 import static com.bignerdranch.android.maplbsline.Tools.ClientSocket.checkPasswordFromServer;
-import static com.bignerdranch.android.maplbsline.Tools.ClientSocket.updateDay1AndDay2;
 
 public class SignIn extends AppCompatActivity implements View.OnClickListener{
 
@@ -123,57 +124,46 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
      * updateSQLite : 在新的一天更新数据库
      */
     private void updateSQLite() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                dbHelper = new DataBaseHelper(SignIn.this.getApplicationContext(), "DayLine.db", null, 3);
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
-                ContentValues values = new ContentValues();
-                Cursor cursorDate = db.query("date", null, null, null, null, null, null);
-                if (cursorDate.getCount() == 0) {
-                    values.put("everyday", checkDate());
-                    db.insert("date", null, values);
-                    values.clear();
-                    Log.d(TAG, "updateSQLite: tttttttttttttttttttttttttttttttttttttttt");
-                } else if (cursorDate.moveToLast()) {
-                    Log.d(TAG, "updateSQLite: vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv" + cursorDate.getLong(cursorDate.getColumnIndex("everyday")));
-                    if (checkDate() > cursorDate.getLong(cursorDate.getColumnIndex("everyday"))) {
+        dbHelper = new DataBaseHelper(SignIn.this.getApplicationContext(), "DayLine.db", null, 3);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        Cursor cursorDate = db.query("date", null, null, null, null, null, null);
+        if (cursorDate.getCount() == 0) {
+            values.put("everyday", checkDate());
+            db.insert("date", null, values);
+            values.clear();
+        } else if (cursorDate.moveToLast()) {
+            Log.d(TAG, "updateSQLite: vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv" + cursorDate.getLong(cursorDate.getColumnIndex("everyday")));
+            if (checkDate() == cursorDate.getLong(cursorDate.getColumnIndex("everyday"))) {
+                 values.put("everyday", checkDate());
+                db.insert("date", null, values);
+                values.clear();
+                db.delete("Day2", null, null);
 
-                        values.put("everyday", checkDate());
-                        db.insert("date", null, values);
-                        values.clear();
+                Cursor cursorDay1 = db.query("Day1", null, null, null, null, null, null);
+                if (!(cursorDay1.getCount() == 0)) {
+                    Log.d(TAG, "updateSQLite: " + cursorDay1.getCount());
+                    if (cursorDay1.moveToFirst()) {
+                        do {
+                            double lat = cursorDay1.getDouble(cursorDay1.getColumnIndex("latitude"));
+                            double log = cursorDay1.getDouble(cursorDay1.getColumnIndex("longitude"));
 
-//                        ClientSocket.updateDay1AndDay2(phoneNum);
-                        db.delete("Day2", null, null);
+                            values.put("latitude", lat);
+                            values.put("longitude", log);
+                            db.insert("Day2", null, values);
+                            latLngList.add(new LatLng(lat, log));
+                            values.clear();
+                        } while (cursorDay1.moveToNext());
+                        Log.d(TAG, "testtesttesttesttest: " + latLngList.size());
+                        ClientSocket.addLocationLatitude(phoneNum, "yesterday", latLngList, "true");
+                        ClientSocket.addLocationLongitude(phoneNum, "yesterday", latLngList);
 
-
-                        Cursor cursorDay1 = db.query("Day1", null, null, null, null, null, null);
-                        if (!(cursorDay1.getCount() == 0)) {
-                            Log.d(TAG, "updateSQLite: " + cursorDay1.getCount());
-                            if (cursorDay1.moveToFirst()) {
-                                do {
-                                    double lat = cursorDay1.getDouble(cursorDay1.getColumnIndex("latitude"));
-                                    double log = cursorDay1.getDouble(cursorDay1.getColumnIndex("longitude"));
-
-                                    values.put("latitude", lat);
-                                    values.put("longitude", log);
-                                    db.insert("Day2", null, values);
-                                    latLngList.add(new LatLng(lat, log));
-                                    values.clear();
-                                } while (cursorDay1.moveToNext());
-                                Log.d(TAG, "testtesttesttesttest: " + latLngList.size());
-                                ClientSocket.addLocationLatitude(phoneNum, "yesterday", latLngList, "true");
-                                ClientSocket.addLocationLongitude(phoneNum, "yesterday", latLngList);
-
-                                db.delete("Day1", null, null);
-                            }
-                        } else {
-                            Log.d(TAG, "updateSQLite: uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
-                        }
+                        db.delete("Day1", null, null);
                     }
-                }
+                } else {
+                    Log.d(TAG, "updateSQLite: uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");}
             }
-        }).start();
+        }
     }
 
 /**
@@ -191,22 +181,73 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
                 Toast.makeText(this, "请输入密码", Toast.LENGTH_SHORT).show();
             }
         } else if (isIntNumber(phoneNum) && isTrueCount(phoneNum)){
-            Log.d(TAG, "onClick: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"+phoneNum +"aaaaa" +passwordEdit.getText().toString() +phoneNum);
-            if (ClientSocket.checkNumFromServer(phoneNum) &&
-                    ClientSocket.checkPasswordFromServer(phoneNum, password)) {
-                updateSQLite();
-                Log.d(TAG, "login: inininiiininininininininininnniiinininininininininini");
-                intent = new Intent(SignIn.this, MainActivity.class);
-                intent.putExtra("phoneNumber", phoneNum);
-                startActivity(intent);
-                finish();
-            } else if (!ClientSocket.checkNumFromServer(phoneNum)) {
-                Log.d(TAG, "onClick: " + ClientSocket.checkNumFromServer(phoneNum) );
-                Toast.makeText(this, "用户名不存在", Toast.LENGTH_SHORT).show();
-            } else if (!ClientSocket.checkPasswordFromServer(phoneNum, password)) {
-                Toast.makeText(this, "密码不正确", Toast.LENGTH_SHORT).show();
+           ClientSocket.checkNumFromServer(phoneNum, new SetNameListener() {
+                @Override
+                public void onFinish(String name) {}
+
+                @Override
+                public void onFinish(List<FriendsInfo> friendsInfoList) {}
+
+                @Override
+                public void onFinish(Intent intent) {}
+
+                @Override
+                public void onFinish(boolean result) {
+                    if (!result) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(SignIn.this, "用户名不存在", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                    } else {
+                        ClientSocket.checkPasswordFromServer(phoneNum, password, new SetNameListener() {
+                            @Override
+                            public void onFinish(String name) {
+
+                            }
+
+                            @Override
+                            public void onFinish(List<FriendsInfo> friendsInfoList) {
+
+                            }
+
+                            @Override
+                            public void onFinish(Intent intent) {
+
+                            }
+
+                            @Override
+                            public void onFinish(boolean result) {
+                                if (!result) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(SignIn.this, "密码不正确", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+
+                                } else {
+                                    updateSQLite();
+                                    Log.d(TAG, "login: inininiiininininininininininnniiinininininininininini");
+                                    Intent intent = new Intent(SignIn.this, MainActivity.class);
+                                    intent.putExtra("phoneNumber", phoneNum);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }
+
+                            @Override
+                            public void onLocationGetFinish(List<Double> doubleList) {
+                            }
+                        });
+                    }
+                }
+                @Override
+                public void onLocationGetFinish(List<Double> doubleList) {}});
+
             }
-        }
     }
 
     /**

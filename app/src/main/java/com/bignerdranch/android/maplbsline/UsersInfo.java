@@ -67,6 +67,9 @@ public class UsersInfo extends AppCompatActivity implements View.OnClickListener
             }
 
             @Override
+            public void onFinish(boolean result) {}
+
+            @Override
             public void onLocationGetFinish(List<Double> doubleList) {}
         }));
 

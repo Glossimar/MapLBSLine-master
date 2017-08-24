@@ -25,87 +25,43 @@ import java.util.concurrent.ExecutionException;
 import static android.content.ContentValues.TAG;
 
 public class ClientSocket{
-
-//    private Socket s;
-//    private String phoneNum;
-//    private String password;
-//    private int functions;
     private static boolean result = false;
     private static List<Double> latResult = null;
     private static List<Double> lonResult = null;
     private static List<LatLng> locationResult  = null;
-    private static String IPAddress = "123.207.31.42";
+    private static String IPAddress = "172.18.39.227";
     private static int portNumber = 9999;
-//
-//    public static final int getPhoneFromServer = 1;
-//    private final int getPasswordFromServer = 2;
-//    private final int findCertenClientTrack = 3;
-//    private final int getCertenClientDay1BufferLat = 4;
-//    private final int sendClientInfo = 5;
-//    private final int getCertenClientDay1Bufferlng = 6;
-//    private final int updateDay1AndDay2 = 7;
-//    private final int checkNumFromServer = 8;
-//    private final int checkPasswordFromServer = 9;
-//    private final int addNewClient = 10;
-//    public static final int addNewTrackLatitude = 11;
-//    public static final int addNewTrackLongitude = 12;
-//    public static final int getCertenClientTrack1 = 13;
-//    public static final int searchClient = 14;
 
 
     public static boolean getPhoneFromServer(final Socket s, final String phoneNum) throws IOException {
-
-        final String[] a = new String[1];
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-                try {
-                    //        String fileDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
-//        File f = new File(fileDirectory + "PhoneNumber.txt");
-                    BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
-//        BufferedWriter bw = new BufferedWriter(new FileWriter(phoneNum)
-                    String line;
-                    result = false;
-//        List<String> phoneNumList = new ArrayList<>();
-                    while ((line = br.readLine()) != null) {
-//            phoneNumList.add(line);
-                        Log.d(TAG, "run: line" +line);
-                        if (line.equals(phoneNum)) {
-                            result = true;
-                            break;
-                        }
-                    }
-                    Log.d(TAG, "run:" + line);
-                    a[0] = "ok";
-                } catch (Exception e) {
-                    e.printStackTrace();
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            String line;
+            result = false;
+            while ((line = br.readLine()) != null) {
+                Log.d(TAG, "run: line" +line);
+                if (line.equals(phoneNum)) {
+                    result = true;
+                    break;
                 }
-
-//            }
-//        }).start();
-        while (true) {
-            if (a[0] == "ok") {
-                break;
             }
+            Log.d(TAG, "run:" + line);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return result;
     }
 
     public static boolean getPasswordFromServer(final Socket s, final String phoneNum, final String password){
-        final String[] a = new String[1];
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+
                 String fileDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
                 File f = new File(fileDirectory + "Password.txt");
                 try {
                     BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
-//        BufferedWriter bw = new BufferedWriter(new FileWriter(phoneNum)
                     String line;
                     result = false;
-//                    List<String> phoneNumList = new ArrayList<>();
                     while ((line = br.readLine()) != null) {
-//            phoneNumList.add(line);
                         Log.d(TAG, "getInfoFromServer: " + line);
                         if (line.equals(phoneNum+password)) {
                             Log.d(TAG, "run: " + password + phoneNum);
@@ -113,23 +69,17 @@ public class ClientSocket{
                             break;
                         }
                     }
-                    a[0] = "ok";
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
-        }).start();
-        while (true) {
-            if (a[0] == "ok") {
-                break;
-            }
-        }
+
         Log.d(TAG, "getPasswordFromServer: " + result);
         return result;
     }
 
-    public static void checkNameFromServer(final String phoneNumber, SetNameListener listener){
-        final String[] a =new String[2];
+    public static void checkNameFromServer(final String phoneNumber, final SetNameListener listener){
+        final String[] a =new String[1];
         new Thread(new Runnable() {
 
             @Override
@@ -141,20 +91,13 @@ public class ClientSocket{
                     os.write("Check client name\n".getBytes());
                     a[0] = getNameFromServer(phoneNumber, s);
                     s.close();
-                    a[1] = "ok";
+                    listener.onFinish(a[0]);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }).start();
-        while (true){
-            if (a[1] == "ok") {
-                Log.d(TAG, "checkNumFromServer: 888888");
-                break;
-            }
-        }
         Log.d(TAG, "checkNumFromServer: 22222222222");
-        listener.onFinish(a[0]);
     }
 
     public static String getNameFromServer(final String phoneNum, Socket s){
@@ -198,136 +141,7 @@ public class ClientSocket{
         return friendsInfoList;
     }
 
-    public static boolean getAddCResFromServer(){
-        final String[] a = new String[1];
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Socket s = new Socket(IPAddress, portNumber);
-                    BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        if (line == "true") {
-                            result = true;
-                            break;
-                        }
-                    }
-                    a[0] = "ok";
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-        while (true) {
-            if (a[0] == "ok") {
-                break;
-            }
-        }
-        return result;
-    }
-
-    public static void findCertenClientTrack(final Socket s, final String phoneNum){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
-                    String line = phoneNum + "Day1";
-                    bw.write(line);
-                    bw.newLine();
-                    bw.flush();
-                    s.shutdownOutput();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-
-    }
-
-    public static List<Double> getCertenClientDay1BufferLat(final Socket s){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-              try {
-                  BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
-                  List<Double> latitudeList = new ArrayList<>();
-//        List<String> longitudeList = new ArrayList<>();
-                  String line = null;
-                  if (!((line = br.readLine()) == null)) {
-                      while ((line = br.readLine()) != null) {
-                          latitudeList.add(Double.parseDouble(line));
-                      }
-                      latResult = latitudeList;
-                  }
-              } catch (Exception e) {
-                  e.printStackTrace();
-              }
-            }
-        }).start();
-        return latResult;
-    }
-
-    public static void sendClientInfo (final Socket s, final String phoneNumber) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
-                    bw.write(phoneNumber);
-                    bw.newLine();
-                    bw.flush();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-
-    }
-
-    public static List<Double> getCertenClientDay1Bufferlng(final Socket s){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
-//        List<Double> longitudeList = new ArrayList<>();
-                    List<Double> longitudeList = new ArrayList<>();
-                    String line = null;
-                    if (!((line = br.readLine()) == null)) {
-
-                    } else {
-                        while ((line = br.readLine()) != null) {
-                            longitudeList.add(Double.parseDouble(line));
-                        }
-                        lonResult = longitudeList;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-        return lonResult;
-    }
-
-    public static void updateDay1AndDay2(final String phoneNumber) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Socket s = new Socket(IPAddress, portNumber);
-                    OutputStream os = s.getOutputStream();
-                    os.write(("Update Day1\n" + phoneNumber).getBytes());
-                    s.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
-    public static boolean checkNumFromServer(final String phoneNumber){
+    public static boolean checkNumFromServer(final String phoneNumber, final SetNameListener listener){
         final String[] a = {null};
         new Thread(new Runnable() {
 
@@ -338,28 +152,19 @@ public class ClientSocket{
                     OutputStream os = s.getOutputStream();
                     Log.d(TAG, "checkNumFromServer: 0000000000000000000000000");
                     os.write("Check phone number".getBytes());
-
                     result = getPhoneFromServer(s, phoneNumber);
+                    listener.onFinish(result);
                     s.close();
-                    a[0] = "ok";
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }).start();
-        while (true){
-            if (a[0] == "ok") {
-                Log.d(TAG, "checkNumFromServer: 888888");
-                break;
-            }
-        }
-        Log.d(TAG, "checkNumFromServer: 22222222222");
         return result;
     }
 
-    public static boolean checkPasswordFromServer(final String phoneNumber, final String password) {
+    public static boolean checkPasswordFromServer(final String phoneNumber, final String password, final SetNameListener listener) {
         final Boolean[] passwordResult = {false};
-        final String[] a = {null};
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -370,7 +175,7 @@ public class ClientSocket{
                     os.write("Check password".getBytes());
                     passwordResult[0] = getPasswordFromServer(s, phoneNumber, password);
                     Log.d(TAG, "run: checkPasswordFromServercheckPasswordFromServercheckPasswordFromServer");
-                    a[0] = "ok";
+                    listener.onFinish(passwordResult[0]);
                     s.close();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -378,12 +183,6 @@ public class ClientSocket{
             }
         }).start();
         Log.d("ClientSocketTools", "checkPasswordFromServer: " + passwordResult[0]);
-        while (true){
-            if (a[0] == "ok") {
-                Log.d(TAG, "checkNumFromServer: 888888");
-                break;
-            }
-        }
         return passwordResult[0];
     }
 
@@ -394,10 +193,7 @@ public class ClientSocket{
                 try {
                     Socket s = new Socket(IPAddress, portNumber);
                     OutputStream os = s.getOutputStream();
-//                    os.write("Add new client\n".getBytes());
                     os.write(("Add new client\n" + phoneNum + "\n" + phoneNum + password + "\n" + phoneNum + name + "\n").getBytes());
-//                    os.write((phoneNum + password + "\n").getBytes());
-//                    os.write((phoneNum + name + "\n").getBytes());
                     s.shutdownOutput();
                     s.close();
                 } catch (Exception e) {
@@ -438,65 +234,6 @@ public class ClientSocket{
 
     }
 
-    public static void addNewTrackLongitude(final List<Double> longitudeList) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                List<String> longitudeString= new ArrayList<>();
-                for (int i = 0; i < longitudeString.size(); i++) {
-                    longitudeString.add(longitudeList.get(i).toString());
-                }
-
-                try {
-                    Socket s = new Socket(IPAddress, portNumber);
-                    OutputStream os = s.getOutputStream();
-                    os.write("Add new location of longitude".getBytes());
-                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
-                    for (int i = 0; i < longitudeString.size(); i ++) {
-                        bw.write(longitudeString.get(i));
-                        bw.newLine();
-                        bw.flush();
-                    }
-                    s.shutdownOutput();
-                    s.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-
-    }
-
-    public static List<LatLng> getCertenClientTrack1(final String phoneNumber) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Socket s = new Socket(IPAddress, portNumber);
-                    OutputStream os = s.getOutputStream();
-                    os.write("Get certen client latitude of track1".getBytes());
-                    findCertenClientTrack(s, phoneNumber);
-                    List<Double> latitudeList = getCertenClientDay1BufferLat(s);
-//                    s.close();
-                    s = new Socket("172.18.39.227", portNumber);
-                    os.write("Get certen client longitude of track1".getBytes());
-                    findCertenClientTrack(s, phoneNumber);
-                    List<Double> longitudeList = getCertenClientDay1Bufferlng(s);
-
-                    List<LatLng> locationList = new ArrayList<>();
-                    for (int i = 0; i < longitudeList.size(); i++) {
-                        LatLng latlng = new LatLng(latitudeList.get(i), longitudeList.get(i));
-                        locationList.add(latlng);
-                    }
-                    locationResult= locationList;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-
-        return locationResult;
-    }
 
     public static void checkFriendsFromServer(final String phoneNumber, final SetNameListener listener){
 
@@ -508,7 +245,7 @@ public class ClientSocket{
                 try {
                     Socket s = new Socket(IPAddress, portNumber);
                     OutputStream os = s.getOutputStream();
-                    Log.d(TAG, "checkNumFromServer: 0000000000000000000000000");
+
                     os.write(("Check friends information\n" + phoneNumber + "\n").getBytes());
 //                    os.write(().getBytes());
                     List<FriendsInfo> friendsInfoList = getFriendsFromServer(s);
@@ -519,7 +256,7 @@ public class ClientSocket{
                 }
             }
         }).start();
-        Log.d(TAG, "checkNumFromServer: 22222222222");
+
     }
 
     public static void addNewFriends(final String myPhoneNumber, final String friendsInfo){
@@ -530,11 +267,7 @@ public class ClientSocket{
                 try {
                     Socket s = new Socket(IPAddress, portNumber);
                     OutputStream os = s.getOutputStream();
-                    Log.d(TAG, "checkNumFromServer: 0000000000000000000000000");
                     os.write(("Add new friends\n" + myPhoneNumber + "\n" + friendsInfo + "\n").getBytes());
-//                    os.write((myPhoneNumber + "\n").getBytes());
-//                    Log.d(TAG, "run: " + myPhoneNumber + friendsInfo);
-//                    os.write((friendsInfo + "\n").getBytes());
                     s.shutdownOutput();
                     s.close();
                 } catch (Exception e) {
@@ -542,11 +275,10 @@ public class ClientSocket{
                 }
             }
         }).start();
-        Log.d(TAG, "checkNumFromServer: 22222222222");
     }
 
     public static boolean addLocationLatitude(final String phoneNum, final String date, final List<LatLng> latLngList, final String ifUpdate){
-        final String[] a = new String[1];
+        final int[] i = {0};
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -554,7 +286,6 @@ public class ClientSocket{
                     Socket s = new Socket(IPAddress, portNumber);
                     OutputStream os = s.getOutputStream();
                     os.write(("Add new Location Latitude\n" + phoneNum + "\n" + date + "\n" + ifUpdate +"\n").getBytes());
-//                    os.close();
                     for (int i = 0; i < latLngList.size(); i ++) {
                         Log.d("addLocationLongitude", "run: " + latLngList.size());
                         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
@@ -565,20 +296,20 @@ public class ClientSocket{
                     s.shutdownOutput();
 
 //                    s.close();
-                    a[0] = "ok";
+                    i[0] =1;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }).start();
         while (true) {
-            if (a[0] == "ok") break;
+            if (i[0] == 1) break;
         }
         return true;
     }
 
     public static boolean addLocationLongitude(final String phoneNum, final String date, final List<LatLng> latLngList){
-        final String[] a = new String[1];
+        final int[] i = {0};
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -596,14 +327,14 @@ public class ClientSocket{
                     }
                     s.shutdownOutput();
 //                    s.close();
-                    a[0] = "ok";
+                    i[0] =1;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }).start();
         while (true) {
-            if (a[0] == "ok") break;
+            if (i[0] == 1) break;
         }
         return true;
     }
@@ -612,7 +343,6 @@ public class ClientSocket{
             , final SetNameListener listener){
         final List<Double> lattitudeList = new ArrayList<>();
         String fileDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
-
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -658,29 +388,5 @@ public class ClientSocket{
             }
         }).start();
     }
-
-
-//    public static boolean searchClient(final String phoneNumber) {
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    Socket s = new Socket(IPAddress, portNumber);
-//                    OutputStream os = s.getOutputStream();
-//                    os.write("Search client".getBytes());
-//                    sendClientInfo(s, phoneNumber);
-//                    InputStream is = s.getInputStream();
-//                    byte[] bys = new byte[1024];
-//                    int len = is.read(bys);
-//                    result =Boolean.parseBoolean(new String(bys, 0, len));
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
-//
-//        return result;
-//    }
-//
 
 }

@@ -201,6 +201,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onFinish(Intent intent) {}
 
             @Override
+            public void onFinish(boolean result) {}
+
+            @Override
             public void onLocationGetFinish(List<Double> doubleList) {}
         });
 
