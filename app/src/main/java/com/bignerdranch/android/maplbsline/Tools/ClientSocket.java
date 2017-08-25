@@ -18,9 +18,9 @@ import static android.content.ContentValues.TAG;
 
 public class ClientSocket{
     private static boolean result = false;
-    private static String IPAddress = "172.18.39.227";
+    private static String IPAddress = "123.207.31.42";
     private static int portNumber = 45556;
-//123.207.31.42
+//172.18.39.227
 
     private static boolean getPhoneFromServer(final Socket s, final String phoneNum) throws IOException {
         try {
@@ -222,7 +222,7 @@ public class ClientSocket{
                 try {
                     Socket s = new Socket(IPAddress, portNumber);
                     OutputStream os = s.getOutputStream();
-                    os.write(("Add new Location Latitude\n" + phoneNum + "\n" + date + "\n" + ifUpdate +"\n").getBytes());
+                    os.write(("Add new Location  Latitude\n" + phoneNum + "\n" + date + "\n" + ifUpdate +"\n").getBytes());
                     for (int i = 0; i < latLngList.size(); i ++) {
                         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
                         bw.write((latLngList.get(i).latitude) + "");

@@ -125,7 +125,7 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
             values.clear();
         } else if (cursorDate.moveToLast()) {
             Log.d(TAG, "updateSQLite: " + cursorDate.getLong(cursorDate.getColumnIndex("everyday")));
-            if (checkDate() > cursorDate.getLong(cursorDate.getColumnIndex("everyday"))) {
+            if (checkDate() == cursorDate.getLong(cursorDate.getColumnIndex("everyday"))) {
                  values.put("everyday", checkDate());
                 db.insert("date", null, values);
                 values.clear();
