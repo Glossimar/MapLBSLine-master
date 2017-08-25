@@ -52,7 +52,6 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener{
             Toast.makeText(this, "昵称不能为空", Toast.LENGTH_SHORT).show();
         } else if (!phoneNumber.equals("") && !password.equals("")) {
             if (isIntNumber(phoneNumber) && isTrueCount(phoneNumber)) {
-                Toast.makeText(this, name, Toast.LENGTH_SHORT).show();
                 ClientSocket.addNewClient(phoneNumber, password, name);
             } else {
                 Toast.makeText(this, "请输入有效的电话号码", Toast.LENGTH_SHORT).show();

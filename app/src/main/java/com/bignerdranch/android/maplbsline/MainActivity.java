@@ -92,10 +92,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mLocationClient.registerLocationListener(new MyLocationListener());
         SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_main);
-//        dbHelper = new DataBaseHelper(this, "DayLine.db", null, 1);
         initView();
         getPermissionAllow();
-//        drawLine();
     }
 
     public void initView() {
@@ -114,12 +112,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
-//        navigationView.setCheckedItem(R.id.menu_name);               将昵称设置为默认选项
+
+        if (isFirstLocate) Toast.makeText(this, "定位校准中，一分钟以后再按右边的图标绘制路线哦", Toast.LENGTH_LONG).show();
+
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
